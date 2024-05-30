@@ -3,137 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sensor Data and Graph</title>
+  <title>Sensor Data</title>
+  <!-- Include Firebase JavaScript SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .sensor-data {
-      text-align: center;
-    }
-    .sensor-data p {
-      margin: 5px 0;
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="sensor-data">
-      <h1>Sensor Data</h1>
-      <p id="co2">CO2: -- ppm</p>
-      <p id="temperature">Temperature: -- °C</p>
-      <p id="humidity">Humidity: -- %</p>
-    </div>
-    <canvas id="dataChart24" width="400" height="200"></canvas>
-    <canvas id="dataChart7" width="400" height="200"></canvas>
-  </div>
+  <h1>Sensor Data</h1>
+
+  <div id="sensorData"></div>
 
   <script>
-    // Your Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDK6yCcA7ryNtvyw29L2qgmzcSsLjBkCw4",
-      authDomain: "sostation-98210.firebaseapp.com",
-      databaseURL: "https://sostation-98210-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "sostation-98210",
-      storageBucket: "sostation-98210.appspot.com",
-      messagingSenderId: "444929897363",
-      appId: "1:444929897363:web:d88629c9ee59e8f6596e66",
-    };
-
     // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
 
-    // Function to fetch latest data entry
-    function fetchLatestData(path, callback) {
-      db.ref(path).orderByKey().limitToLast(1).once('value', snapshot => {
-        const data = snapshot.val();
-        if (data) {
-          const latestKey = Object.keys(data)[0];
-          const latestValue = data[latestKey];
-          callback({ timestamp: parseInt(latestKey), value: latestValue });
-        } else {
-          callback(null);
+    // Reference to your Firebase database
+    const database = firebase.database();
+
+    // Reference to the sensor data node
+    const sensorDataRef = database.ref('sensor_data');
+
+    // Function to fetch sensor data
+    function fetchSensorData() {
+      sensorDataRef.once('value', function(snapshot) {
+        const sensorData = snapshot.val();
+        const sensorDataContainer = document.getElementById('sensorData');
+        sensorDataContainer.innerHTML = ''; // Clear previous data
+
+        // Iterate over each sensor data entry
+        for (const key in sensorData) {
+          if (sensorData.hasOwnProperty(key)) {
+            const data = sensorData[key];
+            const paragraph = document.createElement('p');
+            paragraph.textContent = `${key}: ${data}`;
+            sensorDataContainer.appendChild(paragraph);
+          }
         }
       });
     }
 
-    // Function to fetch and display graph
-    function fetchAndDisplayGraph(path, chartId, title) {
-      fetchLatestData(path, latest => {
-        if (latest) {
-          const ctx = document.getElementById(chartId).getContext('2d');
-          new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: [new Date(latest.timestamp).toLocaleString()],
-              datasets: [{
-                label: title,
-                data: [latest.value],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-                fill: false
-              }]
-            },
-            options: {
-              scales: {
-                x: {
-                  type: 'time',
-                  time: {
-                    unit: 'hour'
-                  }
-                },
-                y: {
-                  beginAtZero: true
-                }
-              },
-              plugins: {
-                title: {
-                  display: true,
-                  text: title
-                }
-              }
-            }
-          });
-        }
-      });
-    }
-
-    // Display current sensor data
-    fetchLatestData('sensor_data/CO2', latest => {
-      if (latest) {
-        document.getElementById('co2').textContent = `CO2: ${latest.value} ppm`;
-      }
-    });
-    fetchLatestData('sensor_data/Temperature', latest => {
-      if (latest) {
-        document.getElementById('temperature').textContent = `Temperature: ${latest.value} °C`;
-      }
-    });
-    fetchLatestData('sensor_data/Humidity', latest => {
-      if (latest) {
-        document.getElementById('humidity').textContent = `Humidity: ${latest.value} %`;
-      }
-    });
-
-    // Fetch and display graphs
-    fetchAndDisplayGraph('sensor_data/CO2', 'dataChart24', 'CO2 (ppm)');
-    fetchAndDisplayGraph('sensor_data/Temperature', 'dataChart7', 'Temperature (°C)');
-    fetchAndDisplayGraph('sensor_data/Humidity', 'dataChart7', 'Humidity (%)');
+    // Call the fetchSensorData function to fetch data on page load
+    fetchSensorData();
   </script>
 </body>
 </html>
