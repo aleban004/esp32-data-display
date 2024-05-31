@@ -10,9 +10,9 @@
     <!-- Include Chart.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0"></script>
     <style>
-        .chart-container {
-            width: 200px; /* Adjust width as needed */
-            height: 100px; /* Adjust height as needed */
+        canvas {
+            width: 5cm;
+            height: 2.5cm;
         }
     </style>
     <script>
@@ -107,66 +107,45 @@
         }
 
         // Function to create a chart using Chart.js
-        // Function to create a chart using Chart.js
         function createChart(labels, values, chartId, chartLabel) {
             var ctx = document.getElementById(chartId).getContext('2d');
-            try {
-                var myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: chartLabel,
-                            data: values,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'hour', // Specify the time unit
-                                    displayFormats: {
-                                        hour: 'MMM D, hA' // Format for hourly labels (e.g., Jan 1, 12AM)
-                                    }
-                                }
-                            },
-                         y: {
-                                suggestedMin: Math.min(...values), // Start from the smallest recorded number
-                                beginAtZero: false // Do not start from zero
-                            }
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: chartLabel,
+                        data: values,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            suggestedMin: Math.min(...values), // Start from the smallest recorded number
+                            beginAtZero: false
                         }
                     }
-                });
-            } catch (error) {
-                console.error("Error creating chart:", error);
-            }
+                }
+            });
         }
 
-
+        // Fetch data on page load
         window.onload = function() {
             fetchLatestSensorData();
             // Refresh data every 10 minutes (600,000 milliseconds)
-            setInterval(fetchLatestSensorData, 600000);
+            setInterval(fetchLatestSensorData, 300000);
         };
     </script>
 </head>
 <body>
     <h1>Sensor Data</h1>
-    <p>CO2: <span id="latestCO2">-- ppm</span></p>
-    <p>Temperature: <span id="latestTemperature">-- °C</span></p>
-    <p>Humidity: <span id="latestHumidity">-- %</span></p>
-
-    <div class="chart-container">
-        <canvas id="co2Chart"></canvas>
-    </div>
-    <div class="chart-container">
-        <canvas id="temperatureChart"></canvas>
-    </div>
-    <div class="chart-container">
-        <canvas id="humidityChart"></canvas>
-    </div>
+    <p>Latest CO2: <span id="latestCO2">-- ppm</span></p>
+    <canvas id="co2Chart"></canvas>
+    <p>Latest Temperature: <span id="latestTemperature">-- °C</span></p>
+    <canvas id="temperatureChart"></canvas>
+    <p>Latest Humidity: <span id="latestHumidity">-- %</span></p>
+    <canvas id="humidityChart"></canvas>
 </body>
 </html>
