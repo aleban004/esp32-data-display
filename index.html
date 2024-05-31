@@ -1,92 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sensor Data</title>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .sensor-data {
-      text-align: center;
-    }
-    .sensor-data p {
-      margin: 5px 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-cTirxnWL0Ejmt4wNGwAx5ZkGSUbyXAk",
+            authDomain: "sostation-98210.firebaseapp.com",
+            databaseURL: "https://sostation-98210-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "sostation-98210",
+            storageBucket: "sostation-98210.appspot.com",
+            messagingSenderId: "497626233654",
+            appId: "1:497626233654:web:b7b4dd169d6f380f72a283"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Function to fetch the latest sensor data
+        function fetchLatestSensorData() {
+            database.ref('sensor_data').limitToLast(1).once('value', function(snapshot) {
+                let data = snapshot.val();
+                let latestKey = Object.keys(data)[0];
+                let latestData = data[latestKey];
+
+                document.getElementById('co2').textContent = latestData.CO2 + ' ppm';
+                document.getElementById('temperature').textContent = latestData.Temperature + ' °C';
+                document.getElementById('humidity').textContent = latestData.Humidity + ' %';
+            }).catch(function(error) {
+                console.error("Error fetching sensor data:", error);
+            });
+        }
+
+        // Fetch data on page load
+        window.onload = function() {
+            fetchLatestSensorData();
+            // Refresh data every 10 minutes (600,000 milliseconds)
+            setInterval(fetchLatestSensorData, 600000);
+        };
+    </script>
 </head>
 <body>
-  <div class="container">
-    <div class="sensor-data">
-      <h1>Sensor Data</h1>
-      <p id="co2">CO2: -- ppm</p>
-      <p id="temperature">Temperature: -- °C</p>
-      <p id="humidity">Humidity: -- %</p>
-    </div>
-  </div>
-
-  <script>
-    // Your Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDK6yCcA7ryNtvyw29L2qgmzcSsLjBkCw4",
-      authDomain: "sostation-98210.firebaseapp.com",
-      databaseURL: "https://sostation-98210-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "sostation-98210",
-      storageBucket: "sostation-98210.appspot.com",
-      messagingSenderId: "444929897363",
-      appId: "1:444929897363:web:d88629c9ee59e8f6596e66"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // Function to fetch the latest sensor data
-    function fetchSensorData() {
-      db.ref('sensor_data/CO2').limitToLast(1).once('value', snapshot => {
-        const data = snapshot.val();
-        if (data) {
-          const key = Object.keys(data)[0];
-          document.getElementById('co2').textContent = `CO2: ${data[key]} ppm`;
-        }
-      });
-
-      db.ref('sensor_data/Temperature').limitToLast(1).once('value', snapshot => {
-        const data = snapshot.val();
-        if (data) {
-          const key = Object.keys(data)[0];
-          document.getElementById('temperature').textContent = `Temperature: ${data[key]} °C`;
-        }
-      });
-
-      db.ref('sensor_data/Humidity').limitToLast(1).once('value', snapshot => {
-        const data = snapshot.val();
-        if (data) {
-          const key = Object.keys(data)[0];
-          document.getElementById('humidity').textContent = `Humidity: ${data[key]} %`;
-        }
-      });
-    }
-
-    // Fetch sensor data immediately on page load
-    fetchSensorData();
-
-    // Set an interval to fetch the latest data every 10 minutes (600000 milliseconds)
-    setInterval(fetchSensorData, 600000);
-  </script>
+    <h1>Sensor Data</h1>
+    <p>CO2: <span id="co2">-- ppm</span></p>
+    <p>Temperature: <span id="temperature">-- °C</span></p>
+    <p>Humidity: <span id="humidity">-- %</span></p>
 </body>
 </html>
