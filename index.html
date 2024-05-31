@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data</title>
+    <title>Sensor Data - Last 24 Hours</title>
     <!-- Include Firebase libraries from CDN -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -16,6 +16,9 @@
             text-align: center;
         }
         canvas {
+            margin-top: 20px;
+        }
+        #latestData {
             margin-top: 20px;
         }
     </style>
@@ -35,49 +38,10 @@
         firebase.initializeApp(firebaseConfig);
         var database = firebase.database();
 
-        // Function to fetch the latest sensor data
-        function fetchLatestSensorData() {
-            // Fetch latest CO2 data
-            database.ref('sensor_data/CO2').limitToLast(1).once('value').then(function(snapshot) {
-                let data = snapshot.val();
-                if (data) {
-                    let latestKey = Object.keys(data).sort().pop();
-                    let latestData = data[latestKey];
-                    document.getElementById('latestCo2').textContent = latestData + ' ppm';
-                }
-            }).catch(function(error) {
-                console.error("Error fetching latest CO2 data:", error);
-            });
-
-            // Fetch latest Temperature data
-            database.ref('sensor_data/Temperature').limitToLast(1).once('value').then(function(snapshot) {
-                let data = snapshot.val();
-                if (data) {
-                    let latestKey = Object.keys(data).sort().pop();
-                    let latestData = data[latestKey];
-                    document.getElementById('latestTemperature').textContent = latestData + ' °C';
-                }
-            }).catch(function(error) {
-                console.error("Error fetching latest Temperature data:", error);
-            });
-
-            // Fetch latest Humidity data
-            database.ref('sensor_data/Humidity').limitToLast(1).once('value').then(function(snapshot) {
-                let data = snapshot.val();
-                if (data) {
-                    let latestKey = Object.keys(data).sort().pop();
-                    let latestData = data[latestKey];
-                    document.getElementById('latestHumidity').textContent = latestData + ' %';
-                }
-            }).catch(function(error) {
-                console.error("Error fetching latest Humidity data:", error);
-            });
-        }
-
         // Function to fetch sensor data for the last 24 hours
         function fetchDataForLast24Hours() {
             let oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-            database.ref('sensor_data/CO2').orderByKey().startAt(String(oneDayAgo)).once('value').then(function(snapshot) {
+            database.ref('sensor_data/CO2').orderByKey().startAt(String(oneDayAgo)).on('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
                     let labels = [];
@@ -88,8 +52,36 @@
                     });
                     displayChart(labels, values, 'last24HoursChart', 'CO2 (ppm) - Last 24 Hours');
                 }
-            }).catch(function(error) {
-                console.error("Error fetching 24 hours CO2 data:", error);
+            });
+
+            // Fetch latest CO2 data
+            database.ref('sensor_data/CO2').limitToLast(1).on('value', function(snapshot) {
+                let data = snapshot.val();
+                if (data) {
+                    let latestKey = Object.keys(data).sort().pop();
+                    let latestData = data[latestKey];
+                    document.getElementById('latestCO2').textContent = "Latest CO2: " + latestData + " ppm";
+                }
+            });
+
+            // Fetch latest Temperature data
+            database.ref('sensor_data/Temperature').limitToLast(1).on('value', function(snapshot) {
+                let data = snapshot.val();
+                if (data) {
+                    let latestKey = Object.keys(data).sort().pop();
+                    let latestData = data[latestKey];
+                    document.getElementById('latestTemperature').textContent = "Latest Temperature: " + latestData + " °C";
+                }
+            });
+
+            // Fetch latest Humidity data
+            database.ref('sensor_data/Humidity').limitToLast(1).on('value', function(snapshot) {
+                let data = snapshot.val();
+                if (data) {
+                    let latestKey = Object.keys(data).sort().pop();
+                    let latestData = data[latestKey];
+                    document.getElementById('latestHumidity').textContent = "Latest Humidity: " + latestData + " %";
+                }
             });
         }
 
@@ -124,11 +116,9 @@
         }
 
         window.onload = function() {
-            fetchLatestSensorData();
             fetchDataForLast24Hours();
 
             // Refresh data every 10 minutes
-            setInterval(fetchLatestSensorData, 10 * 60 * 1000);
             setInterval(fetchDataForLast24Hours, 10 * 60 * 1000);
         }
     </script>
@@ -136,10 +126,11 @@
 <body>
     <div class="container">
         <h1>Sensor Data - Last 24 Hours</h1>
-        <p>Latest CO2: <span id="latestCo2">Loading...</span></p>
-        <p>Latest Temperature: <span id="latestTemperature">Loading...</span></p>
-        <p>Latest Humidity: <span id="latestHumidity">Loading...</span></p>
+        <p id="latestCO2">Loading latest CO2 data...</p>
+        <p id="latestTemperature">Loading latest temperature data...</p>
+        <p id="latestHumidity">Loading latest humidity data...</p>
         <canvas id="last24HoursChart"></canvas>
     </div>
 </body>
 </html>
+
