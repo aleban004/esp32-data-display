@@ -24,6 +24,7 @@
 
         // Function to fetch the latest sensor data
         function fetchLatestSensorData() {
+            // Fetch latest CO2 data
             database.ref('sensor_data/CO2').limitToLast(1).once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
@@ -33,7 +34,33 @@
                     document.getElementById('co2').textContent = latestData + ' ppm';
                 }
             }).catch(function(error) {
-                console.error("Error fetching sensor data:", error);
+                console.error("Error fetching CO2 data:", error);
+            });
+
+            // Fetch latest Temperature data
+            database.ref('sensor_data/Temperature').limitToLast(1).once('value', function(snapshot) {
+                let data = snapshot.val();
+                if (data) {
+                    let latestKey = Object.keys(data).sort().pop();
+                    let latestData = data[latestKey];
+                    
+                    document.getElementById('temperature').textContent = latestData + ' °C';
+                }
+            }).catch(function(error) {
+                console.error("Error fetching Temperature data:", error);
+            });
+
+            // Fetch latest Humidity data
+            database.ref('sensor_data/Humidity').limitToLast(1).once('value', function(snapshot) {
+                let data = snapshot.val();
+                if (data) {
+                    let latestKey = Object.keys(data).sort().pop();
+                    let latestData = data[latestKey];
+                    
+                    document.getElementById('humidity').textContent = latestData + ' %';
+                }
+            }).catch(function(error) {
+                console.error("Error fetching Humidity data:", error);
             });
         }
 
@@ -48,5 +75,7 @@
 <body>
     <h1>Sensor Data</h1>
     <p>CO2: <span id="co2">-- ppm</span></p>
+    <p>Temperature: <span id="temperature">-- °C</span></p>
+    <p>Humidity: <span id="humidity">-- %</span></p>
 </body>
 </html>
