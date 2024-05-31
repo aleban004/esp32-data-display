@@ -12,7 +12,7 @@
     <style>
         body{
             font-family: Arial, sans-serif;
-            background-color: antiquewhite;
+            background-color: darkgrey;
             text-align: center;
         }
         #co2Chart {
@@ -134,6 +134,8 @@
                     }]
                 },
                 options: {
+                    width: 400,
+                    height: 200,
                     scales: {
                         y: {
                             suggestedMin: Math.min(...values), // Start from the smallest recorded number
