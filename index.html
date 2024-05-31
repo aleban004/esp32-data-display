@@ -15,15 +15,15 @@
             background-color: antiquewhite;
             text-align: center;
         }
-        .co2Chart {
+        #co2Chart {
             width: 5cm;
             height: 2.5cm;
         }
-        .temperatureChart {
+        #temperatureChart {
             width: 5cm;
             height: 2.5cm;
         }
-        .humidityChart {
+        #humidityChart {
             width: 5cm;
             height: 2.5cm;
         }
@@ -139,7 +139,13 @@
                             suggestedMin: Math.min(...values), // Start from the smallest recorded number
                             beginAtZero: false
                         }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // This removes the legend
+                        }
                     }
+                    
                 }
             });
         }
