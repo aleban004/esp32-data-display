@@ -10,9 +10,9 @@
     <!-- Include Chart.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0"></script>
     <style>
-        canvas {
-            width: 5cm;
-            height: 2.5cm;
+        .chart-container {
+            width: 200px; /* Adjust width as needed */
+            height: 100px; /* Adjust height as needed */
         }
     </style>
     <script>
@@ -122,30 +122,42 @@
                 },
                 options: {
                     scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour'
+                            }
+                        },
                         y: {
                             suggestedMin: Math.min(...values), // Start from the smallest recorded number
-                            beginAtZero: false
+                            beginAtZero: false // Do not start from zero
                         }
                     }
                 }
             });
         }
 
-        // Fetch data on page load
         window.onload = function() {
             fetchLatestSensorData();
             // Refresh data every 10 minutes (600,000 milliseconds)
-            setInterval(fetchLatestSensorData, 300000);
+            setInterval(fetchLatestSensorData, 600000);
         };
     </script>
 </head>
 <body>
     <h1>Sensor Data</h1>
-    <p>Latest CO2: <span id="latestCO2">-- ppm</span></p>
-    <canvas id="co2Chart"></canvas>
-    <p>Latest Temperature: <span id="latestTemperature">-- °C</span></p>
-    <canvas id="temperatureChart"></canvas>
-    <p>Latest Humidity: <span id="latestHumidity">-- %</span></p>
-    <canvas id="humidityChart"></canvas>
+    <p>CO2: <span id="latestCO2">-- ppm</span></p>
+    <p>Temperature: <span id="latestTemperature">-- °C</span></p>
+    <p>Humidity: <span id="latestHumidity">-- %</span></p>
+
+    <div class="chart-container">
+        <canvas id="co2Chart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="temperatureChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="humidityChart"></canvas>
+    </div>
 </body>
 </html>
