@@ -15,6 +15,24 @@
             background-color: antiquewhite;
             text-align: center;
         }
+        .nadpis{
+            color: darkred;
+            font-size: 70px;
+            font-weight: bolder;
+        }
+        .nadpis2{
+            font-size: 50px;
+            font-weight: bold;
+        }
+        .co2{
+            font-size: 40px;
+        }
+        .temp{
+            font-size: 40px;
+        }
+        .hum{
+            font-size: 40px;
+        }
         #co2Chart {
             width: 5cm;
             height: 2.5cm;
@@ -158,12 +176,16 @@
     </script>
 </head>
 <body>
-    <h1>Sensor Data</h1>
-    <p>CO2: <span id="latestCO2">-- ppm</span></p>
-    <p>Temperature: <span id="latestTemperature">-- °C</span></p>
-    <p>Humidity: <span id="latestHumidity">-- %</span></p>
-    <canvas height="50" width="25" id="co2Chart"></canvas>
-    <canvas id="temperatureChart"></canvas>
-    <canvas id="humidityChart"></canvas>
+    <h1 class="nadpis">SOS - Smart Ovzdusie Station</h1>
+    <h1 class="nadpis2">Current values:</h1>
+    <p class="co2">CO2: <span id="latestCO2">-- ppm</span></p>
+    <p class="temp">Temperature: <span id="latestTemperature">-- °C</span></p>
+    <p class="hum">Humidity: <span id="latestHumidity">-- %</span></p>
+    <h1 class="nadpis2">CO2 concentration last 24 hours:</h1>
+    <canvas height="50" id="co2Chart" ></canvas>
+    <h1 class="nadpis2">Temperature last 24 hours:</h1>
+    <canvas height="50" id="temperatureChart"></canvas>
+    <h1 class="nadpis2">Humidity last 24 hours:</h1>
+    <canvas height="50" id="humidityChart"></canvas>
 </body>
 </html>
