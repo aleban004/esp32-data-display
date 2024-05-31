@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Data</title>
-    <!-- Include Firebase libraries from CDN -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <!-- Include Chart.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0"></script>
     <style>
         body{
@@ -47,7 +45,6 @@
         }
     </style>
     <script>
-        // Your web app's Firebase configuration
         var firebaseConfig = {
             apiKey: "AIzaSyB-cTirxnWL0Ejmt4wNGwAx5ZkGSUbyXAk",
             authDomain: "sostation-98210.firebaseapp.com",
@@ -57,14 +54,9 @@
             messagingSenderId: "497626233654",
             appId: "1:497626233654:web:b7b4dd169d6f380f72a283"
         };
-
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         var database = firebase.database();
-
-        // Function to fetch the latest sensor data
         function fetchLatestSensorData() {
-            // Fetch latest CO2 data
             database.ref('sensor_data/CO2').limitToLast(1).once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
@@ -75,8 +67,6 @@
             }).catch(function(error) {
                 console.error("Error fetching CO2 data:", error);
             });
-
-            // Fetch latest Temperature data
             database.ref('sensor_data/Temperature').limitToLast(1).once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
@@ -87,8 +77,6 @@
             }).catch(function(error) {
                 console.error("Error fetching Temperature data:", error);
             });
-
-            // Fetch latest Humidity data
             database.ref('sensor_data/Humidity').limitToLast(1).once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
@@ -99,8 +87,6 @@
             }).catch(function(error) {
                 console.error("Error fetching Humidity data:", error);
             });
-
-            // Fetch CO2 data for chart
             database.ref('sensor_data/CO2').once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
@@ -111,8 +97,6 @@
             }).catch(function(error) {
                 console.error("Error fetching CO2 data for chart:", error);
             });
-
-            // Fetch Temperature data for chart
             database.ref('sensor_data/Temperature').once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
@@ -123,8 +107,6 @@
             }).catch(function(error) {
                 console.error("Error fetching Temperature data for chart:", error);
             });
-
-            // Fetch Humidity data for chart
             database.ref('sensor_data/Humidity').once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
@@ -136,8 +118,6 @@
                 console.error("Error fetching Humidity data for chart:", error);
             });
         }
-
-        // Function to create a chart using Chart.js
         function createChart(labels, values, chartId, chartLabel) {
             var ctx = document.getElementById(chartId).getContext('2d');
             var myChart = new Chart(ctx, {
@@ -155,7 +135,7 @@
                 options: {
                     scales: {
                         y: {
-                            suggestedMin: Math.min(...values), // Start from the smallest recorded number
+                            suggestedMin: Math.min(...values),
                             beginAtZero: false
                         }
                     },
@@ -166,11 +146,8 @@
                 }
             });
         }
-
-        // Fetch data on page load
         window.onload = function() {
             fetchLatestSensorData();
-            // Refresh data every 10 minutes (600,000 milliseconds)
             setInterval(fetchLatestSensorData, 300000);
         };
     </script>
