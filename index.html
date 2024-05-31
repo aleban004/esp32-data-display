@@ -107,35 +107,44 @@
         }
 
         // Function to create a chart using Chart.js
+        // Function to create a chart using Chart.js
         function createChart(labels, values, chartId, chartLabel) {
             var ctx = document.getElementById(chartId).getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: chartLabel,
-                        data: values,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'hour'
+            try {
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: chartLabel,
+                            data: values,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'hour', // Specify the time unit
+                                    displayFormats: {
+                                        hour: 'MMM D, hA' // Format for hourly labels (e.g., Jan 1, 12AM)
+                                    }
+                                }
+                            },
+                         y: {
+                                suggestedMin: Math.min(...values), // Start from the smallest recorded number
+                                beginAtZero: false // Do not start from zero
                             }
-                        },
-                        y: {
-                            suggestedMin: Math.min(...values), // Start from the smallest recorded number
-                            beginAtZero: false // Do not start from zero
                         }
                     }
-                }
-            });
+                });
+            } catch (error) {
+                console.error("Error creating chart:", error);
+            }
         }
+
 
         window.onload = function() {
             fetchLatestSensorData();
