@@ -43,11 +43,10 @@
                 if (data) {
                     let latestKey = Object.keys(data).sort().pop();
                     let latestData = data[latestKey];
-                    
-                    document.getElementById('co2').textContent = latestData + ' ppm';
+                    document.getElementById('latestCo2').textContent = latestData + ' ppm';
                 }
             }).catch(function(error) {
-                console.error("Error fetching CO2 data:", error);
+                console.error("Error fetching latest CO2 data:", error);
             });
 
             // Fetch latest Temperature data
@@ -56,11 +55,10 @@
                 if (data) {
                     let latestKey = Object.keys(data).sort().pop();
                     let latestData = data[latestKey];
-                    
-                    document.getElementById('temperature').textContent = latestData + ' °C';
+                    document.getElementById('latestTemperature').textContent = latestData + ' °C';
                 }
             }).catch(function(error) {
-                console.error("Error fetching Temperature data:", error);
+                console.error("Error fetching latest Temperature data:", error);
             });
 
             // Fetch latest Humidity data
@@ -69,11 +67,10 @@
                 if (data) {
                     let latestKey = Object.keys(data).sort().pop();
                     let latestData = data[latestKey];
-                    
-                    document.getElementById('humidity').textContent = latestData + ' %';
+                    document.getElementById('latestHumidity').textContent = latestData + ' %';
                 }
             }).catch(function(error) {
-                console.error("Error fetching Humidity data:", error);
+                console.error("Error fetching latest Humidity data:", error);
             });
         }
 
@@ -89,58 +86,23 @@
                         labels.push(new Date(parseInt(key)).toLocaleTimeString());
                         values.push(data[key]);
                     });
-                    updateChart(last24HoursChart, labels, values);
+                    displayChart(labels, values, 'last24HoursChart', 'CO2 (ppm) - Last 24 Hours');
                 }
             }).catch(function(error) {
                 console.error("Error fetching 24 hours CO2 data:", error);
             });
         }
 
-        // Function to fetch sensor data for the last 7 days
-        function fetchDataForLast7Days() {
-            let sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-            database.ref('sensor_data/CO2').orderByKey().startAt(String(sevenDaysAgo)).once('value').then(function(snapshot) {
-                let data = snapshot.val();
-                if (data) {
-                    let labels = [];
-                    let values = [];
-                    Object.keys(data).forEach(function(key) {
-                        labels.push(new Date(parseInt(key)).toLocaleDateString());
-                        values.push(data[key]);
-                    });
-                    updateChart(last7DaysChart, labels, values);
-                }
-            }).catch(function(error) {
-                console.error("Error fetching 7 days CO2 data:", error);
-            });
-        }
-
-        // Function to update the chart
-        function updateChart(chart, labels, data) {
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = data;
-            chart.update();
-        }
-
-        window.onload = function() {
-            fetchLatestSensorData();
-            fetchDataForLast24Hours();
-            fetchDataForLast7Days();
-
-            // Refresh data every 10 minutes
-            setInterval(fetchLatestSensorData, 10 * 60 * 1000);
-            setInterval(fetchDataForLast24Hours, 10 * 60 * 1000);
-            setInterval(fetchDataForLast7Days, 10 * 60 * 1000);
-
-            // Create charts
-            var ctx1 = document.getElementById('last24HoursChart').getContext('2d');
-            window.last24HoursChart = new Chart(ctx1, {
+        // Function to display the chart
+        function displayChart(labels, data, chartId, chartLabel) {
+            var ctx = document.getElementById(chartId).getContext('2d');
+            var myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: [],
+                    labels: labels,
                     datasets: [{
-                        label: 'CO2 (ppm) - Last 24 Hours',
-                        data: [],
+                        label: chartLabel,
+                        data: data,
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     }]
@@ -159,46 +121,25 @@
                     }
                 }
             });
+        }
 
-            var ctx2 = document.getElementById('last7DaysChart').getContext('2d');
-            window.last7DaysChart = new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'CO2 (ppm) - Last 7 Days',
-                        data: [],
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+        window.onload = function() {
+            fetchLatestSensorData();
+            fetchDataForLast24Hours();
+
+            // Refresh data every 10 minutes
+            setInterval(fetchLatestSensorData, 10 * 60 * 1000);
+            setInterval(fetchDataForLast24Hours, 10 * 60 * 1000);
         }
     </script>
 </head>
 <body>
     <div class="container">
-        <h1>Sensor Data</h1>
-        <div>
-            <p>CO2: <span id="co2">Loading...</span></p>
-            <p>Temperature: <span id="temperature">Loading...</span></p>
-            <p>Humidity: <span id="humidity">Loading...</span></p>
-        </div>
+        <h1>Sensor Data - Last 24 Hours</h1>
+        <p>Latest CO2: <span id="latestCo2">Loading...</span></p>
+        <p>Latest Temperature: <span id="latestTemperature">Loading...</span></p>
+        <p>Latest Humidity: <span id="latestHumidity">Loading...</span></p>
         <canvas id="last24HoursChart"></canvas>
-        <canvas id="last7DaysChart"></canvas>
     </div>
 </body>
 </html>
