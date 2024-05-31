@@ -51,8 +51,8 @@
                         values.push(data[key]);
                     });
                     displayChart(labels, values, 'last24HoursChart', 'CO2 (ppm) - Last 24 Hours');
-                }
-            });
+        }
+    });
 
             // Fetch latest CO2 data
             database.ref('sensor_data/CO2').limitToLast(1).on('value', function(snapshot) {
