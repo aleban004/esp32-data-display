@@ -9,6 +9,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <!-- Include Chart.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.0"></script>
+    <style>
+        canvas {
+            width: 5cm;
+            height: 2.5cm;
+        }
+    </style>
     <script>
         // Your web app's Firebase configuration
         var firebaseConfig = {
@@ -28,7 +34,43 @@
         // Function to fetch the latest sensor data
         function fetchLatestSensorData() {
             // Fetch latest CO2 data
-            database.ref('sensor_data/CO2').limitToLast(10).once('value', function(snapshot) {
+            database.ref('sensor_data/CO2').limitToLast(1).once('value', function(snapshot) {
+                let data = snapshot.val();
+                if (data) {
+                    let latestKey = Object.keys(data).pop();
+                    let latestData = data[latestKey];
+                    document.getElementById('latestCO2').textContent = latestData + ' ppm';
+                }
+            }).catch(function(error) {
+                console.error("Error fetching CO2 data:", error);
+            });
+
+            // Fetch latest Temperature data
+            database.ref('sensor_data/Temperature').limitToLast(1).once('value', function(snapshot) {
+                let data = snapshot.val();
+                if (data) {
+                    let latestKey = Object.keys(data).pop();
+                    let latestData = data[latestKey];
+                    document.getElementById('latestTemperature').textContent = latestData + ' °C';
+                }
+            }).catch(function(error) {
+                console.error("Error fetching Temperature data:", error);
+            });
+
+            // Fetch latest Humidity data
+            database.ref('sensor_data/Humidity').limitToLast(1).once('value', function(snapshot) {
+                let data = snapshot.val();
+                if (data) {
+                    let latestKey = Object.keys(data).pop();
+                    let latestData = data[latestKey];
+                    document.getElementById('latestHumidity').textContent = latestData + ' %';
+                }
+            }).catch(function(error) {
+                console.error("Error fetching Humidity data:", error);
+            });
+
+            // Fetch CO2 data for chart
+            database.ref('sensor_data/CO2').once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
                     let labels = Object.keys(data);
@@ -36,11 +78,11 @@
                     createChart(labels, values, 'co2Chart', 'CO2 (ppm)');
                 }
             }).catch(function(error) {
-                console.error("Error fetching CO2 data:", error);
+                console.error("Error fetching CO2 data for chart:", error);
             });
 
-            // Fetch latest Temperature data
-            database.ref('sensor_data/Temperature').limitToLast(10).once('value', function(snapshot) {
+            // Fetch Temperature data for chart
+            database.ref('sensor_data/Temperature').once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
                     let labels = Object.keys(data);
@@ -48,11 +90,11 @@
                     createChart(labels, values, 'temperatureChart', 'Temperature (°C)');
                 }
             }).catch(function(error) {
-                console.error("Error fetching Temperature data:", error);
+                console.error("Error fetching Temperature data for chart:", error);
             });
 
-            // Fetch latest Humidity data
-            database.ref('sensor_data/Humidity').limitToLast(10).once('value', function(snapshot) {
+            // Fetch Humidity data for chart
+            database.ref('sensor_data/Humidity').once('value', function(snapshot) {
                 let data = snapshot.val();
                 if (data) {
                     let labels = Object.keys(data);
@@ -60,7 +102,7 @@
                     createChart(labels, values, 'humidityChart', 'Humidity (%)');
                 }
             }).catch(function(error) {
-                console.error("Error fetching Humidity data:", error);
+                console.error("Error fetching Humidity data for chart:", error);
             });
         }
 
@@ -81,7 +123,8 @@
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+                            suggestedMin: Math.min(...values), // Start from the smallest recorded number
+                            beginAtZero: false
                         }
                     }
                 }
@@ -98,12 +141,11 @@
 </head>
 <body>
     <h1>Sensor Data</h1>
-    <p>Latest CO2: <span id="co2">-- ppm</span></p>
-    <p>Latest Temperature: <span id="temperature">-- °C</span></p>
-    <p>Latest Humidity: <span id="humidity">-- %</span></p>
-    <canvas id="co2Chart" width="10" height="5"></canvas>
-    <canvas id="temperatureChart" width="10" height="5"></canvas>
-    <canvas id="humidityChart" width="10" height="5"></canvas>
-
+    <p>Latest CO2: <span id="latestCO2">-- ppm</span></p>
+    <canvas id="co2Chart"></canvas>
+    <p>Latest Temperature: <span id="latestTemperature">-- °C</span></p>
+    <canvas id="temperatureChart"></canvas>
+    <p>Latest Humidity: <span id="latestHumidity">-- %</span></p>
+    <canvas id="humidityChart"></canvas>
 </body>
 </html>
