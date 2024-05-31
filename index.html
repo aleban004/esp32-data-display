@@ -24,14 +24,14 @@
 
         // Function to fetch the latest sensor data
         function fetchLatestSensorData() {
-            database.ref('sensor_data').limitToLast(1).once('value', function(snapshot) {
+            database.ref('sensor_data/CO2').limitToLast(1).once('value', function(snapshot) {
                 let data = snapshot.val();
-                let latestKey = Object.keys(data)[0];
-                let latestData = data[latestKey];
-
-                document.getElementById('co2').textContent = latestData.CO2 + ' ppm';
-                document.getElementById('temperature').textContent = latestData.Temperature + ' °C';
-                document.getElementById('humidity').textContent = latestData.Humidity + ' %';
+                if (data) {
+                    let latestKey = Object.keys(data).sort().pop();
+                    let latestData = data[latestKey];
+                    
+                    document.getElementById('co2').textContent = latestData + ' ppm';
+                }
             }).catch(function(error) {
                 console.error("Error fetching sensor data:", error);
             });
@@ -48,7 +48,5 @@
 <body>
     <h1>Sensor Data</h1>
     <p>CO2: <span id="co2">-- ppm</span></p>
-    <p>Temperature: <span id="temperature">-- °C</span></p>
-    <p>Humidity: <span id="humidity">-- %</span></p>
 </body>
 </html>
